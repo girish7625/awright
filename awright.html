@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Awright — Curated Box Matrix v3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1a1814;--ink2:#4a4640;--ink3:#888078;
+  --paper:#faf8f4;--surface:#f2ede6;--border:#e0d8ce;
+  --accent:#c25c2a;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);font-size:13px;line-height:1.5}
+
+header{padding:1.5rem 2rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+h1{font-family:'DM Serif Display',serif;font-size:1.7rem;font-weight:400;letter-spacing:-.02em}
+.sub{font-size:11px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.version{font-size:10px;color:var(--ink3);text-align:right;line-height:1.7}
+.version strong{color:var(--ink2)}
+
+.scope-bar{padding:.8rem 2rem;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.scope-block{font-size:11px}
+.scope-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:4px}
+.scope-in{color:#0a4a2a}
+.scope-out{color:#7a2a0a}
+.scope-pe{color:#3a1a6a}
+
+.cat-legend{padding:.6rem 2rem;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fl{font-size:10px;color:var(--ink3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
+.cb{font-size:11px;padding:3px 9px;border-radius:3px;font-weight:500;line-height:1.4}
+.cb-food{background:#fef3e8;color:#7a3a0a}
+.cb-bar{background:#f0e8fb;color:#3a1a6a}
+.cb-barset{background:#e8e8f0;color:#1a1a4a}
+.cb-decor{background:#fae8ec;color:#7a1a3a}
+.cb-flow{background:#faf0e0;color:#5a3a0a}
+.cb-table{background:#e0f0fa;color:#0a3a6a}
+.cb-diy{background:#e6f4ee;color:#0a4a2a}
+.cb-rent{background:#f0ede0;color:#4a3a0a}
+.cb-crew{background:#ede0e0;color:#5a2a2a}
+.cb-pe{background:#f5f0e0;color:#5a4a2a;font-style:italic}
+
+.filters{padding:.6rem 2rem;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fb{font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:var(--paper);color:var(--ink2);cursor:pointer;transition:all .15s}
+.fb:hover,.fb.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.wrap{padding:1.5rem 2rem 4rem;overflow-x:auto}
+table{border-collapse:collapse;min-width:1100px;width:100%}
+th{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);padding:10px 14px;text-align:left;border-bottom:1.5px solid var(--border);white-space:nowrap;background:var(--paper)}
+th.sh{text-align:center;min-width:180px}
+th.s1{background:#f7f4ff}th.s2{background:#f0f8ff}th.s3{background:#fff8f0}th.s4{background:#fff0f0}th.s5{background:#f0fff4}
+.sr{font-size:10px;color:var(--ink3);font-weight:300;display:block;margin-top:2px}
+td{vertical-align:top;border:1px solid var(--border);padding:0}
+.occ{padding:14px;min-width:130px;background:var(--surface);vertical-align:middle}
+tr:nth-child(odd) .occ{background:#ede8e0}
+.ot{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:3px}
+.on{font-family:'DM Serif Display',serif;font-size:14px;color:var(--ink);line-height:1.3}
+
+.cell{padding:11px 13px;cursor:pointer;transition:background .12s;position:relative}
+.cell:hover{background:rgba(194,92,42,.04)}
+.cell.open{background:rgba(194,92,42,.06)}
+.star{position:absolute;top:7px;right:8px;color:var(--accent);font-size:12px}
+.hint{font-size:10px;color:var(--ink3);margin-top:8px;font-style:italic}
+.cell.open .hint{display:none}
+
+/* Category groupings inside cell */
+.cat-group{margin-bottom:8px}
+.cat-group:last-child{margin-bottom:0}
+.cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.cat-name{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3)}
+.cat-score{font-size:10px;color:var(--ink3)}
+.cat-score strong{color:var(--ink);font-weight:500}
+.cat-items{font-size:11px;color:var(--ink2);line-height:1.5;padding-left:0}
+.vendor{color:var(--accent);font-weight:500;font-size:10px}
+
+/* Plan Easy callout */
+.pe-note{margin-top:8px;padding:6px 9px;background:#f5f0e0;border-left:2px solid #8a6a1a;font-size:10px;color:#5a4a2a;border-radius:0 3px 3px 0;font-style:italic}
+
+.more{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--ink2);line-height:1.6}
+.cell.open .more{display:block}
+.dr{margin-bottom:7px}
+.dr strong{font-weight:500;color:var(--ink);display:block;margin-bottom:2px}
+
+.box-tag{display:inline-block;font-size:9px;padding:1px 5px;border-radius:2px;margin-left:4px;background:var(--accent);color:white;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Awright — Occasion × Size Research Notes</h1>
+    <div class="sub">India · Working document · Open for interpretation</div>
+  </div>
+  <div class="version">
+    <strong>Version 3.3</strong><br>
+    Last updated: Nov 12, 2026 · 6:02 PM IST<br>
+    Click any cell to expand
+  </div>
+</header>
+
+<div style="padding:1rem 2rem;background:var(--paper);border-bottom:1px solid var(--border);font-size:12px;color:var(--ink2);line-height:1.6;max-width:1100px">
+  <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:6px">About this document</div>
+  A working concept note. The framework: occasions on the y-axis, gathering size on the x-axis, categories of products inside each cell. Need (N) and friction (F) scoring per category, with vendor names slotted in from existing research. Nothing here is a recommendation. Cells are open for interpretation, debate, and editing. Treat it as a starting point we read together.
+</div>
+
+<div class="scope-bar">
+  <div class="scope-block" style="flex:2">
+    <div class="scope-title scope-in">✓ Awright ships</div>
+    Food kits · Bar (drinks, mixers, ice, glassware) · Bar setup (counter/cart) · Flowers · Decor (incl. rangoli kits) · Tableware · DIY kits · Rentals (trees/cutlery/decor) · Concierge service (setup, install, cleanup — paid add-on, evolving)
+  </div>
+  <div class="scope-block" style="flex:1">
+    <div class="scope-title scope-out">✗ Not Awright (for now)</div>
+    Photographers, videographers, entertainers, mehndi artists, musicians, DJs, pandits — these get pointed elsewhere.
+  </div>
+</div>
+
+<div style="padding:.6rem 2rem;background:var(--paper);border-bottom:1px solid var(--border);display:flex;gap:20px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--ink2)">
+  <span style="font-size:10px;color:var(--ink3);font-weight:500;text-transform:uppercase;letter-spacing:.06em">Per-category scoring</span>
+  <span><strong style="color:var(--ink)">N</strong> = Need (1 low → 5 must-have for this gathering)</span>
+  <span><strong style="color:var(--ink)">F</strong> = Friction (1 easy to source in India → 5 painful to source)</span>
+  <span style="color:var(--accent);font-weight:500">Sweet spot: N≥4 + F≥3</span>
+</div>
+
+<div class="cat-legend">
+  <span class="fl">Categories:</span>
+  <span class="cb cb-food">Food</span>
+  <span class="cb cb-bar">Bar</span>
+  <span class="cb cb-barset">Bar setup</span>
+  <span class="cb cb-flow">Flowers</span>
+  <span class="cb cb-decor">Decor</span>
+  <span class="cb cb-table">Tableware</span>
+  <span class="cb cb-diy">DIY kits</span>
+  <span class="cb cb-rent">Rentals</span>
+  <span class="cb cb-crew">Concierge (setup/install/cleanup)</span>
+  <span class="cb cb-pe">External</span>
+</div>
+
+<div class="filters">
+  <span class="fl">Filter:</span>
+  <button class="fb on" onclick="filter('all',this)">All occasions</button>
+  <button class="fb" onclick="filter('milestone',this)">Milestone</button>
+  <button class="fb" onclick="filter('festive',this)">Festive</button>
+  <button class="fb" onclick="filter('casual',this)">Social / casual</button>
+  <button class="fb" onclick="filter('cultural',this)">Cultural / religious</button>
+  <button class="fb" onclick="filter('experiential',this)">Experiential</button>
+  <button class="fb" onclick="filter('rtg',this)">RTG</button>
+</div>
+
+<div class="wrap">
+<table>
+<thead>
+<tr>
+  <th style="min-width:130px">Occasion</th>
+  <th class="sh s1">Intimate<span class="sr">2–6 people</span></th>
+  <th class="sh s2">Small<span class="sr">7–15 people</span></th>
+  <th class="sh s3">Medium<span class="sr">16–35 people</span></th>
+  <th class="sh s4">Large<span class="sr">36–75 people</span></th>
+  <th class="sh s5">Event<span class="sr">75+ people</span></th>
+</tr>
+</thead>
+<tbody>
+
+<!-- ============ BIRTHDAY ============ -->
+<tr data-type="milestone">
+<td class="occ"><div class="ot">Milestone</div><div class="on">Birthday</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F1</span></div>
+    <div class="cat-items">Cake from neighbourhood baker. <span class="vendor">Chefling DIY cuisine kit</span> for a themed evening (sushi/ramen ₹950)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">PaperMe paper lamps</span> · <span class="vendor">Babblewrap DIY tabletop tree</span> · fairy lights · custom name cutouts (<span class="vendor">Woodle</span>)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY kit</span><span class="cat-score">N3·F3</span></div>
+    <div class="cat-items"><span class="vendor">Zwende</span> embroidery/coaster kit · <span class="vendor">EazyArts</span> custom paint-by-numbers as a memorable group activity</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes: The intimate birthday</strong>Small, personal, but elevated. Cake is solved locally — Awright's job is the "one good idea." A themed DIY activity (jewellery making, paint-by-numbers) is the box. Conversation starter, takeaway memory.</div>
+    <div class="dr"><strong>AOV range</strong>₹2,500–6,000 for the box (excluding cake)</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items"><span class="vendor">Chefling</span> multi-cuisine kits · <span class="vendor">Zozifills</span> dimsum platter (₹549 / 10 pcs) · <span class="vendor">Meatigo</span> charcuterie board pre-set</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Mixers · ice delivery · glassware set · cocktail recipe cards</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-barset">Bar setup</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Rent: bar cart · ice bucket · jigger set · garnish station</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">Coastal Habitat</span> dried bouquets (reusable) · <span class="vendor">Ellementry</span> crochet marigold sets</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">PaperMe</span> paper lamps · <span class="vendor">Babblewrap</span> mini tree centrepiece · custom acrylic name cutouts</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> linen runners/napkins · <span class="vendor">Nestasia</span> dinnerware sets · <span class="vendor">Popware</span> eco drinkware</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Add-on: 2-hr decor setup before · 1-hr cleanup after · fixed fee</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Nandika persona fits here. Host coordinates 5+ vendor threads currently. One Awright order could combine: food kit + bar essentials + bar setup rental + flowers + decor + tableware rental. Concierge available as add-on for setup/cleanup.</div>
+    <div class="dr"><strong>Why this wins</strong>Three "trusted" items (caterer/bartender/tableware) score high friction. Food and bar are easy in India — Awright's edge is curation + trust, not access.</div>
+    <div class="dr"><strong>External</strong>Want a photographer or DJ? Guide elsewhere.</div>
+    <div class="dr"><strong>AOV range</strong>₹15,000–35,000 per box</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Scaled food kits or partner with full caterer · charcuterie boards · dessert spread</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar + setup</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Multiple bar carts · bulk glassware · ice in volume · full mixer kit</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rentals</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Beyond Rentals</span> tables · chairs · linen · lighting</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">At-scale paper installations · floral arches · custom backdrop</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Setup crew · cleanup crew · servers (delivered, not employed by Awright)</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>At this scale, the experience layer (decor, bar, tableware, rentals) becomes the relevant scope. Coordination overhead is heavier than smaller sizes.</div>
+    <div class="dr"><strong>AOV range</strong>₹40,000–80,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-pe">Out of home thesis</span></div>
+    <div class="cat-items">36+ people in a home is usually a venue conversation. Awright can ship curation kits (decor/tableware) but doesn't own the event.</div>
+  </div>
+  <div class="hint">▸ Click to expand</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Partial Awright play possible — sell the curation kit, decor box, bar setup. Full ops is someone else's problem.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div>
+    <div class="cat-items">Full venue event</div>
+  </div>
+</div></td>
+</tr>
+
+<!-- ============ ANNIVERSARY ============ -->
+<tr data-type="milestone">
+<td class="occ"><div class="ot">Milestone</div><div class="on">Anniversary</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items"><span class="vendor">Chefling</span> chef-at-home cuisine kit · <span class="vendor">Meatigo</span> charcuterie & cheese platter</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Curated wine pairing · champagne · cocktail recipe for two</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items"><span class="vendor">Coastal Habitat</span> bouquets · fresh flower arrangement</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> linen set · <span class="vendor">Table Manners</span> dinnerware · candle holders</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Candles · <span class="vendor">Kash</span> pearl candles · fairy lights</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">Memento</span><span class="cat-score">N3·F3</span></div>
+    <div class="cat-items"><span class="vendor">Mooch</span> custom diary · <span class="vendor">EazyArts</span> custom paint-by-numbers of a shared photo</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>High emotional weight, low complexity. One partner usually planning a surprise. Possible combination: food kit + wine + flowers + tablescape + candles + one memorable element (custom artwork).</div>
+    <div class="dr"><strong>AOV range</strong>₹5,000–15,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Chef-at-home for 10 · charcuterie spread · dessert</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar + setup</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Wine selection · bar cart rental · glassware</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Fresh florals · table centrepieces</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Full table setting rental · linen · candles</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Notes</strong>Intimate dinner with close friends. Anatomy similar to the small dinner party box.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-pe">Becomes mini-wedding</span></div>
+    <div class="cat-items">Beyond the home dinner thesis. Awright can supply premium curation kit.</div>
+  </div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ BRIDAL / BABY SHOWER ============ -->
+<tr data-type="milestone">
+<td class="occ"><div class="ot">Milestone</div><div class="on">Bridal / Baby shower</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Brunch spread · themed catering · custom cake</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware (themed)</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> linen · themed dinnerware · <span class="vendor">Nestasia</span></div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Fresh florals · centrepieces · garland decor</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">GWD Kids</span> baby shower garlands · plush toys · <span class="vendor">The Lavender Label</span> woven baby announcement hampers</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY activity</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Zwende</span> jewellery DIY · <span class="vendor">Shreeyas</span> ready-to-paint tote bags as favours · <span class="vendor">Knot Your Type</span> embroidery kits</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>5–6 close friends. Strong theme intent (Maharashtrian, Rajasthani, etc.). Possible combination: themed tableware rental + matching florals + a DIY activity for the group + favours.</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Brunch catering · custom cake · grazing platter (<span class="vendor">Meatigo</span>)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware (themed)</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> tablecloths + runners + napkins (₹400–3400) · <span class="vendor">Nestasia</span> · regional thali sets (Maharashtrian, Rajasthani)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Fresh marigold canopies · <span class="vendor">Ellementry</span> dried bouquets · centrepieces</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor (themed)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Rare You</span> crochet torans · <span class="vendor">PaperMe</span> paper decor · <span class="vendor">Sirohi</span> handwoven hampers · <span class="vendor">GWD</span> baby shower kits</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY activity</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Zwende</span> Cheriyal mask painting · <span class="vendor">Shreeyas</span> tote bag painting · <span class="vendor">Resin Drizzle</span> flower preservation · <span class="vendor">EazyArts</span> custom paint-by-numbers</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">2-hr theme setup (drape canopies, arrange tablescape) · 1-hr cleanup add-on</div>
+  </div>
+  <div class="pe-note">For mehndi artists or photographer, Awright doesn't carry. Direct user to find them elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>5–10 women, strong theme intent (Maharashtrian, Rajasthani, garden party). Host has the vision but currently sources from multiple places. Theme curation is the gap.</div>
+    <div class="dr"><strong>Box variations</strong>"Garden party shower" · "Maharashtrian shower" · "Boho bridal" · "Mom-to-be brunch" — each with matching tableware/decor/florals/DIY activity.</div>
+    <div class="dr"><strong>AOV range</strong>₹18,000–40,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware at scale</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items">Bulk linen + matching dinnerware · <span class="vendor">Beyond Rentals</span> furniture · multi-table coordination</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Themed decor</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Larger floral installations · backdrop · custom signage</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Becomes a mini sangeet at this size. Awright supplies the curation kit; full event ops sit elsewhere.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Wedding event</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ DIWALI ============ -->
+<tr data-type="festive">
+<td class="occ"><div class="ot">Festive</div><div class="on">Diwali</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Artisan mithai box (not Haldiram) · curated savouries · <span class="vendor">Sirohi</span> hampers</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Fresh marigold strings · <span class="vendor">Ellementry</span> dried marigold (reusable across years)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">PaperMe</span> paper lamps + DIY rangoli (₹349) · brass/clay diya sets · <span class="vendor">Rare You</span> crochet torans · <span class="vendor">Mini Murtees</span> 3D printed murtis</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY rangoli kit</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">PaperMe</span> DIY rangoli sets · <span class="vendor">Giftys</span> MDF Ganesha DIY kit · <span class="vendor">Babblewrap</span> Diwali activity</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes: The Diwali home box</strong>Family Diwali at home. Curated alternative to "go to Fab India + Haldiram." Artisan everything. DIY rangoli kit means kids/family participate — not just decorate, but make.</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Artisan mithai · savouries platter · <span class="vendor">Meatigo</span> cheese for the modern Diwali · <span class="vendor">Sirohi</span> gift hampers for guests</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Mixers · ice · Diwali-themed cocktail recipe cards (saffron sour, kesar mojito)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Fresh marigold strings (kgs) · rose petals · <span class="vendor">Ellementry</span> reusable crochet marigold for repeat Diwalis</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">PaperMe</span> paper lamps (₹999–2,499) · brass diyas · <span class="vendor">Rare You</span> crochet torans (₹2,200) · <span class="vendor">Kala Curry</span> novelty matchbox · ceramic plates</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Brass/copper thalis · <span class="vendor">Bottega Pereira</span> festive linen · <span class="vendor">Nestasia</span> temple sets</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY kit</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">PaperMe</span> DIY rangoli (₹349–1,699) · <span class="vendor">Babblewrap</span> Diwali hamper · <span class="vendor">Kala Curry</span> Diwali themed gifting</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Add-on: stringing marigolds + lamp arrangement + rangoli setup before evening · cleanup next morning</div>
+  </div>
+  <div class="pe-note">Pandit, mehndi artist, photographer not in Awright scope.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Annual occasion across most Indian homes. Mass options dominate the category (Haldiram, Fab India). Artisan / handmade is underserved. Could be tiered — Lite (decor + mithai), Standard (+flowers + tableware), Hero (+DIY rangoli + concierge).</div>
+    <div class="dr"><strong>Repeat behavior</strong>Reusable items (crochet marigolds, brass diyas) carry over year to year. Repeat customer comes back for what they don't have yet.</div>
+    <div class="dr"><strong>AOV range</strong>₹6,000–25,000 per box across tiers</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor at scale</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Bulk marigolds · larger paper installations · multi-room lighting</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">Beyond Rentals</span> · multi-table coordination</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Larger setup team · cleanup crew</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Samira-style Diwali for 25–30. Awright as curation layer.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Society / corporate</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ CHRISTMAS ============ -->
+<tr data-type="festive">
+<td class="occ"><div class="ot">Festive</div><div class="on">Christmas</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rental (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Woodsberg</span> premium Christmas tree (6–8 ft, ₹5,200–9,200) OR <span class="vendor">PaperMe</span> origami trees (₹1,999–24,999)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items"><span class="vendor">Woodsberg</span> Santa figurines (₹232) · wreaths · reindeer · mushroom decor · ornaments</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Pre-made Christmas dinner kit · <span class="vendor">Meatigo</span> cold cuts · <span class="vendor">Chefling</span> roast kit</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Indica</span> mulled wine kit (Delhi) · spice mix · wine pairing</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Family Christmas. Tree rental could be a centrepiece — premium tree for the season, returned in January. Mulled wine kit as a possible add-on.</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rental (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Woodsberg</span> Christmas tree 6–8 ft · <span class="vendor">PaperMe</span> origami trees 3–8 ft · ornament rentals</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Christmas roast kit · <span class="vendor">Meatigo</span> charcuterie · cheese boards · <span class="vendor">Chefling</span> partner menu · panettone sourcing</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Indica</span> mulled wine kit · curated wines · cocktail recipes (eggnog, mulled cider)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Woodsberg</span> Christmas tableware + plates + mugs · <span class="vendor">Bottega Pereira</span> festive runners · candles</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Woodsberg</span> Santa/snowman/reindeer figurines · wreaths · <span class="vendor">PaperMe</span> origami garlands</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY kit</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">Babblewrap</span> DIY tabletop tree (₹1,250) · gingerbread house kit (<span class="vendor">GWD Kids</span>) · Secret Santa wrap kit</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Tree installation crew · decor setup · post-season tree pickup</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Samira persona — 4 Sundays in December, same host. Decor refreshes weekend to weekend. Tree rental spreads cost across season.</div>
+    <div class="dr"><strong>AOV range</strong>₹15,000–40,000 (or ₹50k+ with tree)</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rentals</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Multiple trees · larger ornaments · <span class="vendor">Beyond Rentals</span> furniture</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Carol bar setup · ornament displays · scaled Christmas garlands</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Office parties, large family dos. Awright curation kit only.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Corporate event</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ HOLI ============ -->
+<tr data-type="festive">
+<td class="occ"><div class="ot">Festive</div><div class="on">Holi / Monsoon party</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Colours + activity</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items"><span class="vendor">Babblewrap</span> Holi hamper (DIY paints + potli + pichkari + organic colours, ₹750–1,500) · premium organic gulal</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Thandai mix · bhang prep kit · sherbet</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Holi snack platter · gujiya box · post-Holi meal kit</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge (cleanup, hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Pre-event tarp/cover setup · post-Holi cleanup crew · stain removal kit · extra towels</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Small-scale Holi for family / close friends. Cleanup is an under-considered need observed in research — not typically pre-planned by hosts.</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Colours + activity</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Bulk organic gulal · water pichkari kit · <span class="vendor">Babblewrap</span> jumbo Holi hamper (₹1,500) · DIY rangoli pre-Holi</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Thandai bar kit · bhang prep · sherbet station · cold-press juice add-on</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Holi snack platter · gujiya · papdi chaat · post-Holi heavy meal coordination</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rentals</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Inflatable pool/tub · waterproof speakers (rental) · changing tents</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Pre-event: tarp/cover setup · post: deep clean crew · stain removal kits · towel supply</div>
+  </div>
+  <div class="pe-note">DJ not in Awright scope. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Seasonal. Cleanup is observed as an under-planned need. Monsoon party as an adjacent format — first-rain terrace gathering with chai + pakoda + ambient setup.</div>
+    <div class="dr"><strong>AOV range</strong>₹8,000–20,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Colour at scale</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Bulk gulal · multiple pichkari sets · flower Holi decor</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge at scale</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Larger cleanup operation · multi-person setup</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Needs outdoor space. Awright supplies kit + crew.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Society Holi</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ DINNER PARTY ============ -->
+<tr data-type="casual">
+<td class="occ"><div class="ot">Social / Casual</div><div class="on">Dinner party</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items"><span class="vendor">Chefling</span> cuisine kit · <span class="vendor">Meatigo</span> charcuterie · curated specialty ingredients</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Wine pairing · cocktail recipe card</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Small bouquet · candles</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Notes</strong>Mostly self-managed at this size. A curated ingredient + wine kit could be an entry point.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Chefling</span> themed cuisine kits (sushi/Thai/Mexican) · <span class="vendor">Zozifills</span> dimsum starter · <span class="vendor">Meatigo</span> charcuterie · dessert kit</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Wine selection (matched to cuisine) · cocktail kit · mixers · ice</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-barset">Bar setup</span><span class="cat-score">N3·F3</span></div>
+    <div class="cat-items">Bar cart rental · glassware · jigger set</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Fresh table centrepiece · <span class="vendor">Coastal Habitat</span> dried option</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> linen (tablecloth + runner + napkins) · <span class="vendor">Kala Curry</span> fondue pot or serveware · candle holders</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Candles (<span class="vendor">Kash</span> pearl) · fairy lights · ambient lighting</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N2·F3</span></div>
+    <div class="cat-items">Optional setup hour · cleanup hour add-on</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Themed format — sushi night, Thai night, wine & cheese. Box delivers food kit + matching wine + tableware that fits the theme. Hosts cook or assemble. Guests participate in the theme.</div>
+    <div class="dr"><strong>AOV range</strong>₹8,000–22,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Scaled catering partner · larger grazing setup</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Multi-table linen + dinnerware coordination</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>20-person dinner is a small event. Awright supplies curation kit.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Event territory</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ COCKTAIL / HOUSE PARTY ============ -->
+<tr data-type="casual">
+<td class="occ"><div class="ot">Social / Casual</div><div class="on">Cocktail / House party</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N3·F3</span></div>
+    <div class="cat-items">Curated cocktail kit · premium mixers · ice delivery</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Mostly self-managed at this size. Entry point: cocktail kit.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Mixers + ice (bulk) · garnishes (citrus, herbs) · cocktail recipe cards · auto-generated quantity list by guest count + drinking profile</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-barset">Bar setup (hero)</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Rent: bar cart/counter · glassware sets · ice bucket · jigger + shaker · garnish trays</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Finger food platter · <span class="vendor">Zozifills</span> dimsums · <span class="vendor">Meatigo</span> charcuterie · grazing board</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Small arrangement · dried flowers (reusable)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Fairy lights · candles · ambient setup</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N3·F3</span></div>
+    <div class="cat-items">Setup before · cleanup after add-on</div>
+  </div>
+  <div class="pe-note">For an actual bartender on-site, that's people-as-service — direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Common Saturday-night format in metros. Quantity calculation (alcohol/ice/mixers for X people drinking moderately) is a known pain. Host typically buys alcohol; Awright could carry the rest.</div>
+    <div class="dr"><strong>AOV range</strong>₹6,000–15,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar at scale</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Multi-station bar · bulk glassware · garnish setup</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Setup + cleanup at scale</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Noise/neighbour concerns peak at this size. Worth building a checklist for hosts.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Event territory</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ GAME / MOVIE NIGHT ============ -->
+<tr data-type="casual">
+<td class="occ"><div class="ot">Social / Casual</div><div class="on">Game / Movie night</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">Activity (hero)</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items"><span class="vendor">Kala Curry</span> Pallanguzi · Tic-Tac-Toe · Morabaraba · <span class="vendor">The Good Road</span> Baithak · custom jigsaw puzzles (<span class="vendor">Jigsaw Nation</span>)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Curated snacks · <span class="vendor">Meatigo</span> sliders kit</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Notes</strong>Intimate game night. The curated game kit is the centrepiece.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">Activity (hero)</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items"><span class="vendor">Kala Curry</span> board games · <span class="vendor">EazyArts</span> group paint-by-numbers · <span class="vendor">Pause Project</span> diamond painting kits · <span class="vendor">Mooch</span> custom diary as Murder Mystery game</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rentals</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Projector + screen · bean bags · floor cushions · outdoor sound</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Curated snack box · <span class="vendor">Zozifills</span> dimsums · sliders · popcorn bar</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Casual drinks · beer pairing · soft drink station</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Casual "let's just hang out" gathering. Lowest AOV, highest potential frequency. Projector rental + seating + curated snacks + a game = self-contained evening.</div>
+    <div class="dr"><strong>AOV range</strong>₹3,000–8,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rentals</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Outdoor terrace screen setup · multiple seating areas</div>
+  </div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Society screening</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ PUJA / HOUSEWARMING ============ -->
+<tr data-type="cultural">
+<td class="occ"><div class="ot">Cultural / Religious</div><div class="on">Puja / Housewarming</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Puja kit (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Complete puja samagri · diyas · incense · <span class="vendor">Mini Murtees</span> 3D printed murti · <span class="vendor">Rare You</span> torans</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N5·F1</span></div>
+    <div class="cat-items">Fresh marigold · rose petals · banana leaves</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware (rent)</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Brass / copper thali sets · puja vessels</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Pre-made prasad · traditional sweets · meal partner for lunch</div>
+  </div>
+  <div class="pe-note">Pandit (trusted) not in Awright scope. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes: The puja kit</strong>Single-source puja box. Authenticity is the differentiator.</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Puja decor (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Complete samagri kit · brass diyas · <span class="vendor">Rare You</span> festive torans · <span class="vendor">Mini Murtees</span> murtis · banana leaves · canopy</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers (heavy)</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Fresh marigold (bulk) · rose · jasmine · garlands · floral canopy</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Brass / copper thali sets (rent) · <span class="vendor">Sanal Eco Shop</span> neem wood plates · seating mats</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F2</span></div>
+    <div class="cat-items">Traditional meal catering · prasad · sweets boxes for guests</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Return gifts</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items"><span class="vendor">Sirohi</span> hampers · <span class="vendor">The Good Road</span> custom favours · <span class="vendor">Ekatra</span> coasters</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Flower stringing · canopy setup · arrangement crew · cleanup after</div>
+  </div>
+  <div class="pe-note">Pandit not in Awright scope. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Three categories score 5+4: puja kit, tableware rental, return gifts. Multiple occurrences per year per family. High trust requirement. Limited single-source curated competitors observed in research.</div>
+    <div class="dr"><strong>AOV range</strong>₹10,000–30,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Scaled puja decor</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Bulk flowers · larger canopies · multiple stations</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Full setup team · cleanup after</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Larger family puja. Awright curation + crew.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Society puja</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ EID / NAVRATRI ============ -->
+<tr data-type="cultural">
+<td class="occ"><div class="ot">Cultural / Religious</div><div class="on">Eid / Navratri / Garba</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Specific-brand biryani sourcing · <span class="vendor">Sirohi</span> sweets hamper · sherbet kit</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Traditional serving ware · floor cushions / bolsters</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Notes</strong>Specific food preferences (rice brand, etc.) are observed as a strong pattern. Possible long-term: remembered preferences across orders.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Trusted biryani chef + specific ingredients (rice brand, meat cut) · artisan sweets · sherbet bar · post-iftar coordination</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Sherbet · rose milk · soft drinks station (no alcohol in observant households)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> linen · brass / copper serving · floor cushions · <span class="vendor">Sirohi</span> handwoven mats</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Fresh florals · jasmine garlands</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Decor</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Lanterns · <span class="vendor">Rare You</span> torans · candles · ambient lighting</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Floor seating arrangement · serving setup · cleanup after</div>
+  </div>
+  <div class="pe-note">Qawwali musician, mehndi artist not in Awright. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Hyper-specific food preferences (rice brand, meat cut). Customer specificity could become a long-term differentiator — remembered preferences across orders.</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Catering at scale</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Larger biryani coordination · sweets hamper</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Garba decor</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Carpets + bolsters · floor seating setup · lantern array</div>
+  </div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Community event</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ QAWWALI / THEMED ============ -->
+<tr data-type="experiential">
+<td class="occ"><div class="ot">Experiential</div><div class="on">Themed / Qawwali night</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Atmosphere kit (hero)</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items">Persian rugs · bolsters · vintage lamps · marigold strings · diyas</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Artisan chai station · simple atmospheric snacks · sherbet</div>
+  </div>
+  <div class="pe-note">Live musician not in Awright. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Notes</strong>Intimate themed setup. Atmosphere design is the core element.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Atmosphere kit (hero)</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items">Persian rugs (rent) · bolsters + floor cushions · marigold strings · diya arrangement · vintage lamps · low tables</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-flow">Flowers (heavy)</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items">Fresh marigold (kgs) · rose petals · jasmine</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Artisan chai station · kebab platters · simple but specific (paan, mithai)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items">Sherbet · whiskey (optional, depends on host)</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Traditional serving ware · brass / copper · <span class="vendor">Sirohi</span> handwoven mats</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge (hero)</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items">Pre-event 4-hr setup: rug laying, bolster arrangement, lighting design, flower stringing · post-event teardown</div>
+  </div>
+  <div class="pe-note">Qawwali musician (Roshan's whole thing) → people-as-service. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Roshan's Qawwali nights as a reference point. Three items score 5+5 or 5+4 in this cell. Currently assembled piecemeal by hosts. Could be a single curated bundle.</div>
+    <div class="dr"><strong>Variations to consider</strong>Sufi night · Old-Bombay jazz evening · Garden party 1920s · Hyderabadi mehfil. Same anatomy: floor setup + lighting + florals + traditional food + concierge.</div>
+    <div class="dr"><strong>AOV range</strong>₹20,000–60,000 per box</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-decor">Atmosphere at scale</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Larger rug area · multi-section seating · acoustic management</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items">Larger setup team · acoustic baffles · neighbour-courtesy management</div>
+  </div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Small venue event</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ ART & WINE ============ -->
+<tr data-type="experiential">
+<td class="occ"><div class="ot">Experiential</div><div class="on">Art & Wine / Wellness</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY kit (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Zwende</span> embroidery / coaster / Cheriyal mask kits · <span class="vendor">EazyArts</span> paint-by-numbers · <span class="vendor">Shreeyas</span> tote painting · <span class="vendor">CandlesbyKash</span> candle-making</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items">Curated wine selection · cheese pairing</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N3·F2</span></div>
+    <div class="cat-items"><span class="vendor">Meatigo</span> charcuterie board · snacks</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Notes</strong>Khushboo + Girish's art and wine evening as a reference. DIY kit + wine + cheese.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">DIY kit (hero)</span><span class="cat-score">N5·F4</span></div>
+    <div class="cat-items"><span class="vendor">Zwende</span> all-inclusive kits (Cheriyal mask, Thanjavur doll, block print) · <span class="vendor">EazyArts</span> group paint-by-numbers · <span class="vendor">Pause Project</span> diamond painting · <span class="vendor">CandlesbyKash</span> pearl candle-making · <span class="vendor">Resin Drizzle</span> resin art · <span class="vendor">Delemon</span> DIY jewellery beads</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Bar (curated)</span><span class="cat-score">N5·F3</span></div>
+    <div class="cat-items"><span class="vendor">Indica</span> mulled wine kit (winter) · curated wine flight · cheese pairing notes</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N4·F2</span></div>
+    <div class="cat-items"><span class="vendor">Meatigo</span> charcuterie board · grazing platter · dessert station</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-rent">Rentals</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Easels · pottery wheel · canvas sets · lighting setup</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-table">Tableware</span><span class="cat-score">N3·F3</span></div>
+    <div class="cat-items"><span class="vendor">Bottega Pereira</span> linen · simple curated dinnerware</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-crew">Concierge</span><span class="cat-score">N3·F4</span></div>
+    <div class="cat-items">Optional: art station setup · cleanup of paint/supplies after</div>
+  </div>
+  <div class="pe-note">Live art instructor → people-as-service. Direct user elsewhere.</div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>DIY kit centrepiece, with food + drink supporting. Khushboo + Girish's art and wine evening as the reference.</div>
+    <div class="dr"><strong>Variations to consider</strong>Art & Wine · Candle-making evening · Pottery social · Embroidery circle · Perfume making (from Kavya's ideas).</div>
+    <div class="dr"><strong>AOV range</strong>₹12,000–28,000</div>
+  </div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">Multiple stations</span><span class="cat-score">N4·F4</span></div>
+    <div class="cat-items">Bulk DIY kits · multiple supply stations · curated set list</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Note</strong>Corporate team building. Higher margin, more complex coordination.</div></div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Corporate event</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+<!-- ============ RTG / IMPROMPTU ============ -->
+<tr data-type="rtg">
+<td class="occ"><div class="ot">No reason (RTG)</div><div class="on">Impromptu / Just because</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Tonight kit</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items">Same-day delivery: snacks + drinks + one game (lightweight)</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more"><div class="dr"><strong>Future product</strong>Same-day impromptu kit. Long-term vision, not MVP.</div></div>
+</div></td>
+
+<td><div class="cell">
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-bar">Tonight box (hero)</span><span class="cat-score">N5·F5</span></div>
+    <div class="cat-items">Pre-curated same-day boxes by type: "casual hangout," "movie night," "drinks evening" · drink + snack + one activity · 4-hr delivery window</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-diy">Activity</span><span class="cat-score">N4·F3</span></div>
+    <div class="cat-items">Light game · <span class="vendor">The Good Road</span> Baithak · jenga · cards</div>
+  </div>
+  <div class="cat-group">
+    <div class="cat-head"><span class="cat-name cb cb-food">Food</span><span class="cat-score">N5·F1</span></div>
+    <div class="cat-items">Curated snack box · <span class="vendor">Zozifills</span> frozen dimsums · <span class="vendor">Meatigo</span> cold cuts</div>
+  </div>
+  <div class="hint">▸ Click for box concept</div>
+  <div class="more">
+    <div class="dr"><strong>Notes</strong>Same-day notice gathering. Pre-curated, single-tap order. Depends on logistics infrastructure being in place. Speculative / future-state concept rather than near-term.</div>
+  </div>
+</div></td>
+
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Hard to do impromptu at scale</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Not impromptu anymore</span></div></div></div></td>
+<td><div class="cell"><div class="cat-group"><div class="cat-head"><span class="cat-name cb cb-pe">Out of scope</span></div></div></div></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<script>
+document.querySelectorAll('.cell').forEach(function(c){
+  c.addEventListener('click',function(){
+    var o=this.classList.contains('open');
+    document.querySelectorAll('.cell.open').forEach(function(x){x.classList.remove('open')});
+    if(!o)this.classList.add('open');
+  });
+});
+function filter(t,b){
+  document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  document.querySelectorAll('tbody tr').forEach(function(r){
+    r.style.display=(t==='all'||r.dataset.type===t)?'':'none';
+  });
+}
+</script>
+</body>
+</html>
